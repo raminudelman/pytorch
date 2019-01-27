@@ -15,7 +15,7 @@ namespace gloo {
 
 template <class Context>
 class AllreduceOp final : public Operator<Context> {
-  enum Mode { RING_FULL, RING_CHUNKED, HALVING_DOUBLING, BCUBE };
+  enum Mode { RING_FULL, RING_CHUNKED, HALVING_DOUBLING, BCUBE, PCX_RING, PCX_KING };
 
  public:
   USE_OPERATOR_CONTEXT_FUNCTIONS;
@@ -61,6 +61,18 @@ class AllreduceOp final : public Operator<Context> {
     Mode mode = HALVING_DOUBLING;
     auto bytes = Input(1).nbytes();
 
+    if (const char* var = std::getenv("PCX_MAX_RING")) {
+      if (bytes < atoi(var)){
+        mode = PCX_RING;
+      }
+    }
+
+    if (const char* var = std::getenv("PCX_MAX_KING")) {
+      if (bytes < atoi(var)){
+        mode = PCX_KING;
+      }
+    }
+
     // Store which inputs/outputs this instance initialized with
     update(init_);
 
@@ -95,6 +107,12 @@ class AllreduceOp final : public Operator<Context> {
       case BCUBE:
         initializeBcube();
         return;
+      case PCX_RING:
+        initializePcxRing();
+        return;
+      case PCX_KING:
+        initializePcxKing();
+        return;
     }
 
     CAFFE_ENFORCE(false, "Unreachable code");
@@ -104,6 +122,9 @@ class AllreduceOp final : public Operator<Context> {
   void initializeHalvingDoubling();
   void initializeRingFull();
   void initializeRingChunked();
+  void initializePcxRing();
+  void initializePcxKing();
+
 
   std::once_flag once_;
   std::unique_ptr<::gloo::Algorithm> algorithm_;

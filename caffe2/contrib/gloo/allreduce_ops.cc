@@ -6,6 +6,12 @@
 #include <gloo/allreduce_halving_doubling.h>
 #include <gloo/allreduce_ring.h>
 #include <gloo/allreduce_ring_chunked.h>
+#include <gloo/allreduce_ring_chunked.h>
+#include <gloo/allreduce_ring_chunked.h>
+
+#include "gloo/pcx_allreduce_king.h"
+#include "gloo/pcx_allreduce_ring.h"
+
 #include <gloo/types.h>
 
 namespace {
@@ -91,6 +97,26 @@ void AllreduceOp<Context>::initializeRingFull() {
         init_.context,
         init_.template getOutputs<::gloo::float16>(),
         init_.size));
+  } else {
+    CAFFE_ENFORCE(false, "Unhandled type: ", init_.meta.name());
+  }
+}
+
+template <class Context>
+void AllreduceOp<Context>::initializePcxRing() {
+  if (init_.template IsType<float>()) {
+    algorithm_.reset(new ::gloo::PcxAllreduceRing<float>(
+        init_.context, init_.template getOutputs<float>(), init_.size));
+  } else {
+    CAFFE_ENFORCE(false, "Unhandled type: ", init_.meta.name());
+  }
+}
+
+template <class Context>
+void AllreduceOp<Context>::initializePcxKing() {
+  if (init_.template IsType<float>()) {
+    algorithm_.reset(new ::gloo::PcxAllreduceKing<float>(
+        init_.context, init_.template getOutputs<float>(), init_.size));
   } else {
     CAFFE_ENFORCE(false, "Unhandled type: ", init_.meta.name());
   }
