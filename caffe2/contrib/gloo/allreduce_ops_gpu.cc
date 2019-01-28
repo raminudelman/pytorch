@@ -126,12 +126,18 @@ void AllreduceOp<Context>::initializeHalvingDoubling() {
 template <class Context>
 void AllreduceOp<Context>::initializePcxKing() {
   if (init_.template IsType<float>()) {
+
+    algorithm_.reset(new ::gloo::PcxAllreduceKing<float>(
+        init_.context, init_.template getOutputs<float>(), init_.size));
+
+#if 0
     algorithm_ =
       initializeAlgorithm<::gloo::PcxAllreduceKing, float>(
         gpu_direct_,
         init_.context,
         init_.template getOutputs<float>(),
         init_.size);
+#endif
   } else {
     CAFFE_ENFORCE(false, "Unhandled type: ", init_.meta.name());
   }
@@ -161,12 +167,18 @@ void AllreduceOp<Context>::initializeRingFull() {
 template <class Context>
 void AllreduceOp<Context>::initializePcxRing() {
   if (init_.template IsType<float>()) {
+
+    algorithm_.reset(new ::gloo::PcxAllreduceRing<float>(
+        init_.context, init_.template getOutputs<float>(), init_.size));
+
+#if 0
     algorithm_ =
       initializeAlgorithm<::gloo::PcxAllreduceRing, float>(
         gpu_direct_,
         init_.context,
         init_.template getOutputs<float>(),
         init_.size);
+#endif
   } else {
     CAFFE_ENFORCE(false, "Unhandled type: ", init_.meta.name());
   }
