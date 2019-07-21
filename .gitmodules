@@ -34,6 +34,7 @@
     ignore = dirty
     path = third_party/gloo
     url = https://github.com/raminudelman/gloo.git
+    branch = pcx
 [submodule "third_party/NNPACK_deps/pthreadpool"]
     ignore = dirty
     path = third_party/pthreadpool
